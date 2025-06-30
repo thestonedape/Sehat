@@ -1,4 +1,5 @@
-import { Mail, Github, MapPin } from "lucide-react";
+
+import { Mail, Github } from "lucide-react";
 
 const Contact = () => {
   return (
@@ -40,16 +41,6 @@ const Contact = () => {
                   >
                     github.com/thestonedape/Sehat
                   </a>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="text-blue-600" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900">Location</h3>
-                  <p className="text-slate-600">Pune, Maharashtra</p>
                 </div>
               </div>
             </div>

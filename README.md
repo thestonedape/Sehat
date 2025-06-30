@@ -1,38 +1,39 @@
 
 # Sehat - AI-Powered Skin Disease Detection
 
-A modern, professional web application for skin disease classification using artificial intelligence. Built with React, TypeScript, and Tailwind CSS, designed to integrate seamlessly with a FastAPI backend.
+A modern web application that leverages artificial intelligence to analyze skin conditions from uploaded images. Built with React, TypeScript, and Tailwind CSS for a seamless user experience.
 
-## 🚀 Features
+## 🌟 Overview
 
-- **Modern UI/UX**: Clean, professional design with health-tech aesthetic
-- **Image Upload**: Drag-and-drop or click-to-upload functionality
-- **AI Analysis**: Real-time skin disease prediction with confidence scores
-- **Responsive Design**: Mobile-first approach, works on all devices
-- **Docker Ready**: Containerized for easy deployment
-- **Production Ready**: Optimized builds and deployment configurations
+Sehat provides instant skin disease analysis using advanced machine learning models. Users can upload images of skin conditions and receive AI-powered predictions with confidence scores, making preliminary skin health assessment more accessible.
 
-## 🛠️ Tech Stack
+## ✨ Features
 
-**Frontend:**
-- React 18 with TypeScript
-- Vite for fast development and builds
-- Tailwind CSS for styling
-- React Router for navigation
-- Axios for API calls
+- **AI-Powered Analysis**: Advanced machine learning models for skin condition detection
+- **Instant Results**: Real-time image processing with confidence scoring
+- **User-Friendly Interface**: Clean, intuitive design for easy navigation
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Secure Image Processing**: Client-side image handling with secure backend integration
+- **Modern Tech Stack**: Built with the latest web technologies
 
-**Backend Integration:**
-- FastAPI backend support
-- Image upload and processing
-- AI model predictions
-- Text extraction capabilities
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, Shadcn/UI components
+- **Routing**: React Router DOM
+- **HTTP Client**: Axios
+- **State Management**: React Hooks, TanStack Query
+- **Authentication**: Firebase Authentication
+- **Build Tool**: Vite for fast development and optimized builds
 
 ## 📋 Prerequisites
 
-- Node.js 18+ and npm
-- Docker (optional, for containerized deployment)
+- Node.js 16.0 or higher
+- npm or yarn package manager
 
-## 🔧 Installation & Setup
+## 🚀 Getting Started
+
+### Installation
 
 1. **Clone the repository**
    ```bash
@@ -45,147 +46,154 @@ A modern, professional web application for skin disease classification using art
    npm install
    ```
 
-3. **Environment setup**
+3. **Environment Configuration**
    ```bash
    cp .env.example .env
-   # Edit .env to configure your backend API URL
    ```
+   Update the `.env` file with your API endpoints and configuration.
 
-4. **Start development server**
+4. **Start Development Server**
    ```bash
    npm run dev
    ```
+   
+   Access the application at `http://localhost:5173`
 
-   The app will be available at `http://localhost:5173`
-
-## 🏗️ Build for Production
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-The built files will be in the `dist/` directory.
+The optimized build files will be generated in the `dist/` directory.
 
-## 🐳 Docker Deployment
-
-1. **Build and run with Docker Compose**
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Or build manually**
-   ```bash
-   docker build -t sehat-frontend .
-   docker run -p 80:80 sehat-frontend
-   ```
-
-## 🚀 Deployment Options
-
-### Free Hosting Platforms
-
-**Render.com:**
-1. Connect your GitHub repository
-2. Set build command: `npm run build`
-3. Set publish directory: `dist`
-4. Deploy!
-
-**Railway.app:**
-1. Connect GitHub repository
-2. Railway will auto-detect and deploy
-3. Configure environment variables
-
-**Netlify:**
-1. Connect GitHub repository
-2. Build command: `npm run build`
-3. Publish directory: `dist`
-4. Deploy with continuous integration
-
-## 🔧 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-For production, update `VITE_API_URL` to your deployed backend URL.
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 src/
 ├── components/          # Reusable UI components
+│   ├── ui/             # Shadcn/UI components
 │   ├── Navbar.tsx      # Navigation component
 │   ├── Footer.tsx      # Footer component
-│   └── PredictionCard.tsx # Results display
-├── pages/              # Page components
+│   └── PredictionCard.tsx # Analysis results display
+├── pages/              # Application pages
 │   ├── Home.tsx        # Landing page
 │   ├── About.tsx       # About page
-│   ├── Contact.tsx     # Contact page
-│   └── Prediction.tsx  # Main analysis page
-├── App.tsx             # Main app component
-└── main.tsx           # App entry point
+│   ├── Contact.tsx     # Contact information
+│   ├── Prediction.tsx  # Main analysis interface
+│   └── History.tsx     # Analysis history
+├── contexts/           # React contexts
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+└── config/             # Configuration files
 ```
 
-## 🎨 Design System
+## 🔧 Configuration
 
-**Colors:**
-- Primary: Blue (#1e40af, #3b82f6)
-- Backgrounds: Light gray (#f8fafc, #e5e7eb)
-- Text: Slate variations
-- Accents: Blue variants
+### Environment Variables
 
-**Typography:**
-- Font Family: Inter (Google Fonts)
-- Modern, clean sans-serif design
+Create a `.env` file in the root directory:
 
-## 🔌 API Integration
-
-The frontend expects a FastAPI backend with the following endpoint:
-
-```
-POST /upload-image/
+```env
+VITE_API_URL=your_backend_api_url
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
 ```
 
-**Request:** FormData with image file
-**Response:** 
-```json
-{
-  "prediction": "Acne Vulgaris",
-  "confidence": 0.85,
-  "extracted_text": "Optional extracted text"
-}
+### API Integration
+
+The application expects a backend API with the following endpoints:
+
+- `POST /upload-image/` - Image upload and analysis
+- `GET /history/` - User analysis history
+- `GET /health/` - API health check
+
+## 🐳 Docker Deployment
+
+Build and run using Docker:
+
+```bash
+docker build -t sehat-frontend .
+docker run -p 3000:80 sehat-frontend
 ```
+
+Or use Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+## 🚀 Deployment
+
+### Recommended Platforms
+
+- **Vercel**: Connect your GitHub repository for automatic deployments
+- **Netlify**: Simple drag-and-drop deployment or GitHub integration
+- **Railway**: Container-based deployment with Git integration
+- **AWS S3 + CloudFront**: Static hosting with CDN
+
+### Deployment Configuration
+
+1. Build the project: `npm run build`
+2. Upload the `dist/` folder contents to your hosting platform
+3. Configure environment variables on your hosting platform
+4. Set up custom domain (optional)
 
 ## 🧪 Development
 
-**Available Scripts:**
+### Available Scripts
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint for code quality
 
-## 🚨 Important Disclaimer
+### Code Quality
 
-This application is for educational and informational purposes only. The AI predictions should not be considered as medical advice or diagnosis. Always consult with qualified healthcare professionals for proper medical evaluation and treatment.
+The project uses:
+- TypeScript for type safety
+- ESLint for code linting
+- Prettier for code formatting (recommended)
+
+## 🔐 Security
+
+- All images are processed securely
+- User authentication through Firebase
+- Environment variables for sensitive configuration
+- HTTPS enforced in production
+
+## 📱 Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+## ⚠️ Disclaimer
 
-Built with ❤️ for accessible healthcare technology.
+This application is for educational and informational purposes only. The AI predictions should not be considered as professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare professionals for proper medical evaluation and treatment of skin conditions.
 
-## 🔗 Links
+## 📞 Support
 
-- [GitHub Repository](https://github.com/thestonedape/Sehat)
-- [Live Demo](https://your-demo-url.com)
+For questions, issues, or contributions, please contact:
+- Email: contact.nishantjha@gmail.com
+- GitHub Issues: [Create an issue](https://github.com/thestonedape/Sehat/issues)
+
+## 🙏 Acknowledgments
+
+- Built with modern web technologies
+- Inspired by the need for accessible healthcare technology
+- Community-driven development approach
