@@ -1,4 +1,3 @@
-
 const About = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -10,8 +9,8 @@ const About = () => {
           </p>
         </div>
 
-        <div className="prose prose-lg max-w-none">
-          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
+        <div className="prose prose-lg max-w-none space-y-6">
+          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6 my-6">
             <h2 className="text-2xl font-semibold text-slate-900">Our Mission</h2>
             <p className="text-slate-600 leading-relaxed">
               Sehat aims to democratize access to preliminary skin health analysis through 
@@ -20,7 +19,7 @@ const About = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
+          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6 my-6">
             <h2 className="text-2xl font-semibold text-slate-900">How It Works</h2>
             <div className="space-y-4">
               <div className="flex items-start space-x-4">
@@ -53,7 +52,7 @@ const About = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
+          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6 my-6">
             <h2 className="text-2xl font-semibold text-slate-900">Technology Stack</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -77,7 +76,7 @@ const About = () => {
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 space-y-6 my-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4">Important Disclaimer</h2>
             <p className="text-slate-700 leading-relaxed">
               Sehat is designed for educational and informational purposes only. The AI predictions 

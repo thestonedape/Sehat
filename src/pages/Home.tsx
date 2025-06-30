@@ -21,7 +21,7 @@ const Home = () => {
         // Show cards after typing animation completes
         setTimeout(() => setShowCards(true), 300);
       }
-    }, 25);
+    }, 35);
 
     return () => clearInterval(timer);
   }, []);
