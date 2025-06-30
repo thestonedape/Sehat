@@ -1,0 +1,27 @@
+
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - sehat-network
+
+  backend:
+    # Assuming you have a backend service
+    # Replace this with your actual backend configuration
+    image: your-backend-image:latest
+    ports:
+      - "8000:8000"
+    networks:
+      - sehat-network
+
+networks:
+  sehat-network:
+    driver: bridge

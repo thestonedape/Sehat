@@ -21,18 +21,15 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Set language code for SMS messages (optional)
 auth.languageCode = 'en';
-// Or use device language: auth.useDeviceLanguage();
 
 // For phone authentication
 export const setupRecaptcha = (containerId: string) => {
   return new RecaptchaVerifier(auth, containerId, {
     size: 'invisible',
     callback: () => {
-      // reCAPTCHA solved
       console.log('reCAPTCHA solved');
     },
     'expired-callback': () => {
-      // Response expired. Ask user to solve reCAPTCHA again.
       console.log('reCAPTCHA expired');
     }
   });

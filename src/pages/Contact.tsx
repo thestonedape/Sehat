@@ -1,178 +1,109 @@
-
-import React, { useState } from 'react';
-import { Mail, MessageCircle, Send, User } from 'lucide-react';
+import { Mail, Github, MapPin } from "lucide-react";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Thank you for your message! I will get back to you soon.');
-    setFormData({ name: '', email: '', message: '' });
-  };
-
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Get in Touch
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Have questions about Sehat or want to share feedback? 
-            I'd love to hear from you.
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="space-y-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-slate-900 mb-6">Get in Touch</h1>
+          <p className="text-xl text-slate-600 leading-relaxed">
+            Have questions about Sehat? We'd love to hear from you.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Form - Takes up 2 columns */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-              <div className="flex items-center mb-6">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-full mr-4">
-                  <MessageCircle className="h-6 w-6 text-white" />
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
+            <h2 className="text-2xl font-semibold text-slate-900">Contact Information</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Mail className="text-blue-600" size={24} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Send a Message
-                </h2>
+                <div>
+                  <h3 className="font-semibold text-slate-900">Email</h3>
+                  <p className="text-slate-600">contact.nishantjha@gmail.com</p>
+                </div>
               </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-3">
-                    Your Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-3">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-3">
-                    Your Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-gray-900 placeholder-gray-500"
-                    placeholder="Tell me what's on your mind..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                >
-                  <Send className="h-5 w-5 mr-3" />
-                  Send Message
-                </button>
-              </form>
-            </div>
-          </div>
-
-          {/* Side Panel */}
-          <div className="space-y-6">
-            {/* Quick Info */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Quick Response
-              </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                I typically respond within 24 hours. For urgent matters, 
-                please mention it in your message.
-              </p>
-            </div>
-
-            {/* FAQ */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Common Questions
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                    Is Sehat a medical tool?
-                  </h4>
-                  <p className="text-gray-600 text-xs">
-                    No, it's educational only. Always consult healthcare professionals.
-                  </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Github className="text-blue-600" size={24} />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                    Is my data secure?
-                  </h4>
-                  <p className="text-gray-600 text-xs">
-                    Yes, images are processed securely and not stored permanently.
-                  </p>
+                  <h3 className="font-semibold text-slate-900">GitHub</h3>
+                  <a 
+                    href="https://github.com/thestonedape/Sehat" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                  >
+                    github.com/thestonedape/Sehat
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <MapPin className="text-blue-600" size={24} />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                    Can I suggest features?
-                  </h4>
-                  <p className="text-gray-600 text-xs">
-                    Absolutely! I'd love to hear your ideas for improvement.
-                  </p>
+                  <h3 className="font-semibold text-slate-900">Location</h3>
+                  <p className="text-slate-600">Pune, Maharashtra</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Personal Touch */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">
-                About This Project
-              </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Sehat is a personal project aimed at making skin health 
-                information more accessible through AI technology. 
-                Your feedback helps make it better!
-              </p>
+          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
+            <h2 className="text-2xl font-semibold text-slate-900">Project Info</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-2">Development Status</h3>
+                <p className="text-slate-600">
+                  Sehat is actively being developed as an open-source project. 
+                  We welcome contributions and feedback from the community.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-2">Contributing</h3>
+                <p className="text-slate-600">
+                  Interested in contributing? Check out our GitHub repository 
+                  for contribution guidelines and open issues.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-2">Feedback</h3>
+                <p className="text-slate-600">
+                  Your feedback helps us improve Sehat. Feel free to open 
+                  issues or discussions on our GitHub repository.
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+            Join Our Mission
+          </h2>
+          <p className="text-slate-700 leading-relaxed mb-6">
+            Help us make skin health analysis more accessible to everyone. 
+            Whether you're a developer, designer, or healthcare professional, 
+            there are many ways to contribute to Sehat.
+          </p>
+          <a
+            href="https://github.com/thestonedape/Sehat"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            <Github className="mr-2" size={20} />
+            View on GitHub
+          </a>
         </div>
       </div>
     </div>
