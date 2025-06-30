@@ -92,6 +92,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            title="Close"
           >
             <X className="h-5 w-5" />
           </button>
@@ -197,7 +198,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <div>
                   <input
                     type="tel"
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+91 (955) 123-4567"
                     value={formData.phoneNumber}
                     onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

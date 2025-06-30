@@ -52,11 +52,10 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive(item.path)
+                  className={`text-sm font-medium transition-colors ${isActive(item.path)
                       ? 'text-blue-600'
                       : 'text-gray-700 hover:text-blue-600'
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </Link>
@@ -79,10 +78,20 @@ const Navbar = () => {
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
                       <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-100">
-                        <div className="font-medium">{currentUser.displayName || 'User'}</div>
-                        <div className="text-gray-500">{currentUser.email}</div>
+                        <div
+                          className="font-medium truncate max-w-[200px]"
+                          title={currentUser.displayName || 'User'}
+                        >
+                          {currentUser.displayName || 'User'}
+                        </div>
+                        <div
+                          className="text-gray-500 truncate max-w-[200px]"
+                          title={currentUser.email}
+                        >
+                          {currentUser.email}
+                        </div>
                       </div>
                       <button
                         onClick={handleLogout}
@@ -92,6 +101,7 @@ const Navbar = () => {
                         Sign out
                       </button>
                     </div>
+
                   )}
                 </div>
               ) : (
@@ -125,16 +135,15 @@ const Navbar = () => {
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    isActive(item.path)
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.path)
                       ? 'text-blue-600 bg-blue-50'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Mobile Auth */}
               <div className="border-t border-gray-200 pt-4 pb-3">
                 {currentUser ? (
