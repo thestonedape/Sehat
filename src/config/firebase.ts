@@ -1,6 +1,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, RecaptchaVerifier } from 'firebase/auth';
+import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAEP90TQEg7FZm_W0MDnQxbp3lR-SsEQKk",
@@ -12,9 +13,15 @@ const firebaseConfig = {
   measurementId: "G-LJLL7H7RLV"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const analytics = getAnalytics(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// Set language code for SMS messages (optional)
+auth.languageCode = 'en';
+// Or use device language: auth.useDeviceLanguage();
 
 // For phone authentication
 export const setupRecaptcha = (containerId: string) => {
@@ -22,11 +29,11 @@ export const setupRecaptcha = (containerId: string) => {
     size: 'invisible',
     callback: () => {
       // reCAPTCHA solved
+      console.log('reCAPTCHA solved');
+    },
+    'expired-callback': () => {
+      // Response expired. Ask user to solve reCAPTCHA again.
+      console.log('reCAPTCHA expired');
     }
   });
 };
-
-export default app;
-
-
-
