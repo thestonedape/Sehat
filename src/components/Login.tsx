@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { auth, googleProvider, setupRecaptcha } from '../config/firebase';
@@ -19,6 +18,7 @@ const Login = () => {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showRecaptcha, setShowRecaptcha] = useState(false);
   const { toast } = useToast();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -72,23 +72,39 @@ const Login = () => {
   const handlePhoneAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowRecaptcha(true);
 
     try {
-      const recaptchaVerifier = setupRecaptcha('recaptcha-container');
-      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-      setConfirmationResult(confirmation);
-      toast({
-        title: "Verification code sent",
-        description: "Please check your phone for the verification code",
-      });
+      // Add a small delay to ensure the reCAPTCHA container is rendered
+      setTimeout(async () => {
+        try {
+          const recaptchaVerifier = setupRecaptcha('recaptcha-container');
+          const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+          setConfirmationResult(confirmation);
+          setShowRecaptcha(false);
+          toast({
+            title: "Verification code sent",
+            description: "Please check your phone for the verification code",
+          });
+        } catch (error: any) {
+          setShowRecaptcha(false);
+          toast({
+            title: "Phone authentication failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }, 100);
     } catch (error: any) {
+      setShowRecaptcha(false);
+      setIsLoading(false);
       toast({
         title: "Phone authentication failed",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -200,23 +216,39 @@ const Login = () => {
 
         {/* Phone Login Form */}
         {loginMethod === 'phone' && !confirmationResult && (
-          <form onSubmit={handlePhoneAuth} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1234567890"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
+          <div className="space-y-4">
+            <form onSubmit={handlePhoneAuth} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Sending...' : 'Send Verification Code'}
+              </Button>
+            </form>
+            
+            {/* reCAPTCHA Container with proper styling */}
+            <div className="flex justify-center">
+              <div 
+                id="recaptcha-container" 
+                className={`${showRecaptcha ? 'block' : 'hidden'} bg-white p-4 rounded border shadow-sm`}
+                style={{ minHeight: showRecaptcha ? '78px' : '0px' }}
+              ></div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send Verification Code'}
-            </Button>
-            <div id="recaptcha-container"></div>
-          </form>
+            
+            {showRecaptcha && (
+              <div className="text-center text-sm text-slate-600">
+                Please complete the reCAPTCHA verification above
+              </div>
+            )}
+          </div>
         )}
 
         {/* Verification Code Form */}

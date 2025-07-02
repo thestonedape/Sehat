@@ -22,15 +22,24 @@ export const googleProvider = new GoogleAuthProvider();
 // Set language code for SMS messages (optional)
 auth.languageCode = 'en';
 
-// For phone authentication
+// For phone authentication with better reCAPTCHA handling
 export const setupRecaptcha = (containerId: string) => {
+  // Clear any existing reCAPTCHA
+  const existingContainer = document.getElementById(containerId);
+  if (existingContainer) {
+    existingContainer.innerHTML = '';
+  }
+
   return new RecaptchaVerifier(auth, containerId, {
-    size: 'invisible',
+    size: 'normal', // Changed from 'invisible' to 'normal' to ensure it's always visible
     callback: () => {
       console.log('reCAPTCHA solved');
     },
     'expired-callback': () => {
       console.log('reCAPTCHA expired');
+    },
+    'error-callback': () => {
+      console.log('reCAPTCHA error');
     }
   });
 };
