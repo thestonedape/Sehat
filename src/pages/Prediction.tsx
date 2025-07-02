@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { Upload, X, Loader2, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { saveAnalysisToHistory } from "../utils/historyUtils";
 import PredictionCard from "../components/PredictionCard";
 
 interface PredictionResult {
@@ -66,7 +67,7 @@ const Prediction = () => {
   };
 
   const handleAnalyze = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !previewUrl) return;
 
     setIsLoading(true);
     const formData = new FormData();
@@ -87,6 +88,14 @@ const Prediction = () => {
       setResult(data);
       setShowResults(true);
       
+      // Save to history
+      saveAnalysisToHistory(
+        previewUrl,
+        data.prediction,
+        data.confidence,
+        data.extracted_text
+      );
+      
       toast({
         title: "Analysis complete",
         description: "Your image has been successfully analyzed",
@@ -103,6 +112,14 @@ const Prediction = () => {
       
       setResult(mockResult);
       setShowResults(true);
+      
+      // Save mock result to history as well
+      saveAnalysisToHistory(
+        previewUrl,
+        mockResult.prediction,
+        mockResult.confidence,
+        mockResult.extracted_text
+      );
       
       toast({
         title: "Demo Mode",
