@@ -223,7 +223,7 @@ const Login = () => {
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="+1234567890"
+                  placeholder="+91XXXXXXXXXX"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   required
