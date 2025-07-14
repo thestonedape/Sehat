@@ -33,14 +33,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <img
-                src="/Icon.png"
-                alt="Icon"
-                className="w-6 h-6 object-contain"
-              />
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">S</span>
             </div>
-
             <span className="text-xl font-bold text-slate-900">Sehat</span>
           </Link>
 
@@ -50,10 +45,11 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-colors duration-200 ${isActive(link.path)
+                className={`text-sm font-medium transition-colors duration-200 ${
+                  isActive(link.path)
                     ? "text-blue-600 border-b-2 border-blue-600 pb-1"
                     : "text-slate-600 hover:text-slate-900"
-                  }`}
+                }`}
               >
                 {link.label}
               </Link>
@@ -113,10 +109,11 @@ const Navbar = () => {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`text-sm font-medium px-2 py-1 rounded transition-colors duration-200 ${isActive(link.path)
+                  className={`text-sm font-medium px-2 py-1 rounded transition-colors duration-200 ${
+                    isActive(link.path)
                       ? "text-blue-600 bg-blue-50"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -132,7 +129,7 @@ const Navbar = () => {
                   Sign Out
                 </button>
               ) : (
-                <Dialog>
+                <Dialog open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
                   <DialogTrigger asChild>
                     <button
                       onClick={() => setIsMenuOpen(false)}
