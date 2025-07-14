@@ -1,8 +1,11 @@
 
 interface PredictionResult {
-  prediction: string;
+  predicted_class: string;
   confidence: number;
-  extracted_text?: string;
+  all_predictions: Array<{
+    class_name: string;
+    confidence: number;
+  }>;
 }
 
 interface PredictionCardProps {
@@ -37,7 +40,7 @@ const PredictionCard = ({ result }: PredictionCardProps) => {
           </label>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xl font-bold text-slate-900">
-              {result.prediction}
+              {result.predicted_class}
             </p>
           </div>
         </div>
@@ -64,18 +67,21 @@ const PredictionCard = ({ result }: PredictionCardProps) => {
           </div>
         </div>
 
-        {result.extracted_text && (
-          <div>
-            <label className="text-sm font-semibold text-slate-600 block mb-3">
-              Extracted Text
-            </label>
-            <div className="bg-slate-50 rounded-lg p-4">
-              <p className="text-sm text-slate-700 font-mono leading-relaxed">
-                {result.extracted_text || "No text detected"}
-              </p>
-            </div>
+        <div>
+          <label className="text-sm font-semibold text-slate-600 block mb-3">
+            All Predictions
+          </label>
+          <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+            {result.all_predictions.map((pred, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <span className="text-slate-700">{pred.class_name}</span>
+                <span className="text-slate-600 font-medium">
+                  {(pred.confidence * 100).toFixed(1)}%
+                </span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">

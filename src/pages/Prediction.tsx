@@ -6,9 +6,12 @@ import { saveAnalysisToHistory } from "../utils/historyUtils";
 import PredictionCard from "../components/PredictionCard";
 
 interface PredictionResult {
-  prediction: string;
+  predicted_class: string;
   confidence: number;
-  extracted_text?: string;
+  all_predictions: Array<{
+    class_name: string;
+    confidence: number;
+  }>;
 }
 
 const Prediction = () => {
@@ -74,8 +77,8 @@ const Prediction = () => {
     formData.append('file', selectedFile);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/upload-image/`, {
+      const apiUrl = 'https://sehatprobbackend.onrender.com';
+      const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         body: formData,
       });
@@ -91,9 +94,9 @@ const Prediction = () => {
       // Save to history
       saveAnalysisToHistory(
         previewUrl,
-        data.prediction,
+        data.predicted_class,
         data.confidence,
-        data.extracted_text
+        `Top predictions: ${data.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
       );
       
       toast({
@@ -105,9 +108,13 @@ const Prediction = () => {
       
       // Mock response for demonstration when API is not available
       const mockResult: PredictionResult = {
-        prediction: "Acne Vulgaris",
+        predicted_class: "Acne Vulgaris",
         confidence: 0.85,
-        extracted_text: "Sample extracted text from image"
+        all_predictions: [
+          { class_name: "Acne Vulgaris", confidence: 0.85 },
+          { class_name: "Eczema", confidence: 0.10 },
+          { class_name: "Psoriasis", confidence: 0.05 }
+        ]
       };
       
       setResult(mockResult);
@@ -116,9 +123,9 @@ const Prediction = () => {
       // Save mock result to history as well
       saveAnalysisToHistory(
         previewUrl,
-        mockResult.prediction,
+        mockResult.predicted_class,
         mockResult.confidence,
-        mockResult.extracted_text
+        `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
       );
       
       toast({

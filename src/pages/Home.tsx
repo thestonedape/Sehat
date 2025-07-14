@@ -130,7 +130,6 @@ const Home = () => {
           <p className="text-xl text-slate-600 mb-8">
             Upload your first image and experience AI-powered skin analysis
           </p>
-          
         </div>
       </section>
     </div>
