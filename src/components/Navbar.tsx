@@ -132,7 +132,7 @@ const Navbar = () => {
                   Sign Out
                 </button>
               ) : (
-                <Dialog>
+                <Dialog open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
                   <DialogTrigger asChild>
                     <button
                       onClick={() => setIsMenuOpen(false)}

@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Prediction from "./pages/Prediction";
 import History from "./pages/History";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/prediction" element={<Prediction />} />
               <Route path="/history" element={<History />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
