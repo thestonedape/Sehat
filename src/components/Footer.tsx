@@ -17,7 +17,7 @@ const Footer = () => {
           
           <div className="text-center md:text-right">
             <p className="text-slate-600 text-sm">
-              © 2024 Sehat. AI-Powered Skin Disease Detection
+              © 2025 Sehat. AI-Powered Skin Disease Detection
             </p>
           </div>
         </div>
