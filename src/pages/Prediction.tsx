@@ -1,10 +1,11 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { Upload, X, Loader2, Camera, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { saveAnalysisToHistory } from "../utils/historyUtils";
 import PredictionCard from "../components/PredictionCard";
+import { AuthContext } from "../contexts/AuthContextType";
 
 interface PredictionResult {
   predicted_class: string;
@@ -24,6 +25,7 @@ const Prediction = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -73,6 +75,19 @@ const Prediction = () => {
 
   const handleAnalyze = async () => {
     if (!selectedFile || !previewUrl) return;
+// Check if user is logged in
+    if (!currentUser) {
+      toast({
+        title: "Login Required",
+        description: "Please login to save your analysis history",
+        variant: "default",
+      });
+    }
+
+    console.log('🔍 Starting analysis...', { 
+      userLoggedIn: !!currentUser, 
+      userId: currentUser?.uid 
+    });
 
     setIsLoading(true);
     const formData = new FormData();
@@ -90,16 +105,29 @@ const Prediction = () => {
       }
 
       const data = await response.json();
+      console.log('✅ API response received:', data);
       setResult(data);
       setShowResults(true);
       
-      // Save to history
-      await saveAnalysisToHistory(
-        previewUrl,
-        data.predicted_class,
-        data.confidence,
-        `Top predictions: ${data.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
-      );
+      // Save to history with error handling
+      try {
+        console.log('💾 Saving analysis to history...');
+        const saved = await saveAnalysisToHistory(
+          previewUrl,
+          data.predicted_class,
+          data.confidence,
+          `Top predictions: ${data.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
+        );
+        console.log('✅ Analysis saved successfully:', saved);
+      } catch (saveError: unknown) {
+        console.error('❌ Failed to save to history:', saveError);
+        const errorMessage = saveError instanceof Error ? saveError.message : "Failed to save analysis to history";
+        toast({
+          title: "History Not Saved",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
       
       toast({
         title: "Analysis complete",
@@ -122,13 +150,19 @@ const Prediction = () => {
       setResult(mockResult);
       setShowResults(true);
       
-      // Save mock result to history as well
-      await saveAnalysisToHistory(
-        previewUrl,
-        mockResult.predicted_class,
-        mockResult.confidence,
-        `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
-      );
+      // Save mock result to history with error handling
+      try {
+        console.log('💾 Saving mock analysis to history...');
+        const saved = await saveAnalysisToHistory(
+          previewUrl,
+          mockResult.predicted_class,
+          mockResult.confidence,
+          `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
+        );
+        console.log('✅ Mock analysis saved successfully:', saved);
+      } catch (saveError) {
+        console.error('❌ Failed to save mock to history:', saveError);
+      }
       
       toast({
         title: "Demo Mode",

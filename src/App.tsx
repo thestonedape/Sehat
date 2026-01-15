@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -9,6 +8,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Prediction from "./pages/Prediction";
 import History from "./pages/History";
+import FirestoreTest from "./pages/FirestoreTest";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/prediction" element={<Prediction />} />
               <Route path="/history" element={<History />} />
+              <Route path="/firestore-test" element={<FirestoreTest />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
