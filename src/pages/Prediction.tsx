@@ -94,7 +94,7 @@ const Prediction = () => {
       setShowResults(true);
       
       // Save to history
-      saveAnalysisToHistory(
+      await saveAnalysisToHistory(
         previewUrl,
         data.predicted_class,
         data.confidence,
@@ -123,7 +123,7 @@ const Prediction = () => {
       setShowResults(true);
       
       // Save mock result to history as well
-      saveAnalysisToHistory(
+      await saveAnalysisToHistory(
         previewUrl,
         mockResult.predicted_class,
         mockResult.confidence,

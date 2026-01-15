@@ -6,20 +6,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { generateAnalysisPDF } from "../utils/pdfGenerator";
-import { AnalysisHistory, getAnalysisHistory } from "../utils/historyUtils";
+import { AnalysisHistory, getAnalysisHistory, deleteAnalysisFromHistory } from "../utils/historyUtils";
 
 const History = () => {
   const [history, setHistory] = useState<AnalysisHistory[]>([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisHistory | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const loadHistory = () => {
-    const loadedHistory = getAnalysisHistory();
-    setHistory(loadedHistory);
-    console.log('Loaded history:', loadedHistory);
+  const loadHistory = async () => {
+    setIsLoading(true);
+    try {
+      const loadedHistory = await getAnalysisHistory();
+      setHistory(loadedHistory);
+      console.log('Loaded history:', loadedHistory);
+    } catch (error) {
+      console.error('Error loading history:', error);
+      toast({
+        title: "Error Loading History",
+        description: "Failed to load your analysis history",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -68,14 +81,23 @@ const History = () => {
     }
   };
 
-  const deleteAnalysis = (id: string) => {
-    const updatedHistory = history.filter(item => item.id !== id);
-    setHistory(updatedHistory);
-    localStorage.setItem('analysisHistory', JSON.stringify(updatedHistory));
-    toast({
-      title: "Analysis Deleted",
-      description: "Analysis has been removed from your history",
-    });
+  const deleteAnalysis = async (id: string) => {
+    try {
+      await deleteAnalysisFromHistory(id);
+      const updatedHistory = history.filter(item => item.id !== id);
+      setHistory(updatedHistory);
+      toast({
+        title: "Analysis Deleted",
+        description: "Analysis has been removed from your history",
+      });
+    } catch (error) {
+      console.error('Error deleting analysis:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete the analysis",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleViewAnalysis = (analysis: AnalysisHistory) => {
@@ -106,7 +128,16 @@ const History = () => {
           </p>
         </div>
 
-        {history.length === 0 ? (
+        {isLoading ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <div className="flex justify-center items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+              </div>
+              <p className="text-slate-600 mt-4">Loading your history...</p>
+            </CardContent>
+          </Card>
+        ) : history.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Calendar className="mx-auto h-12 w-12 text-slate-400 mb-4" />
