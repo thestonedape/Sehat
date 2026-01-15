@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from "@/hooks/use-toast";
 import { generateAnalysisPDF } from "../utils/pdfGenerator";
 import { AnalysisHistory, getAnalysisHistory, deleteAnalysisFromHistory } from "../utils/historyUtils";
+import LLMAnalysisCard from "../components/LLMAnalysisCard";
 
 const History = () => {
   const [history, setHistory] = useState<AnalysisHistory[]>([]);
@@ -319,6 +320,12 @@ const History = () => {
                         <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.familyHistory}</p>
                       </div>
                     )}
+                  </div>
+                )}
+                
+                {selectedAnalysis.llmAnalysis && (
+                  <div className="border-t pt-4">
+                    <LLMAnalysisCard analysis={selectedAnalysis.llmAnalysis} />
                   </div>
                 )}
                 

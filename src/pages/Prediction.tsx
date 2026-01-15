@@ -3,9 +3,11 @@ import { useState, useRef, useContext } from "react";
 import { Upload, X, Loader2, Camera, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { saveAnalysisToHistory, updateMedicalInfo, MedicalInfo } from "../utils/historyUtils";
+import { saveAnalysisToHistory, updateMedicalInfo, MedicalInfo, LLMAnalysisResult } from "../utils/historyUtils";
+import { analyzeDiseaseWithLLM } from "../utils/llmAnalysis";
 import PredictionCard from "../components/PredictionCard";
 import RefinementQuestionnaire from "../components/RefinementQuestionnaire";
+import LLMAnalysisCard from "../components/LLMAnalysisCard";
 import { AuthContext } from "../contexts/AuthContextType";
 
 interface PredictionResult {
@@ -25,6 +27,8 @@ const Prediction = () => {
   const [showResults, setShowResults] = useState(false);
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
   const [medicalInfo, setMedicalInfo] = useState<MedicalInfo | undefined>(undefined);
+  const [llmAnalysis, setLlmAnalysis] = useState<LLMAnalysisResult | null>(null);
+  const [isAnalyzingWithLLM, setIsAnalyzingWithLLM] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -186,10 +190,53 @@ const Prediction = () => {
     setResult(null);
     setCurrentAnalysisId(null);
     setMedicalInfo(undefined);
+    setLlmAnalysis(null);
   };
 
   const handleSaveMedicalInfo = async (info: MedicalInfo) => {
     setMedicalInfo(info);
+    
+    // Trigger LLM analysis when medical info is saved
+    if (result) {
+      setIsAnalyzingWithLLM(true);
+      try {
+        const analysis = await analyzeDiseaseWithLLM(
+          result.predicted_class,
+          result.confidence,
+          result.all_predictions,
+          info
+        );
+        
+        if (analysis) {
+          setLlmAnalysis(analysis);
+          
+          // Update the existing analysis in Firestore with LLM results
+          if (currentAnalysisId) {
+            const { updateDoc, doc } = await import('firebase/firestore');
+            const { db } = await import('../config/firebase');
+            
+            await updateDoc(doc(db, 'analysisHistory', currentAnalysisId), {
+              medicalInfo: info,
+              llmAnalysis: analysis
+            });
+          }
+          
+          toast({
+            title: "Analysis Complete",
+            description: "AI has analyzed your medical information and provided personalized insights",
+          });
+        }
+      } catch (error) {
+        console.error('LLM analysis error:', error);
+        toast({
+          title: "Analysis Unavailable",
+          description: "Could not generate AI insights at this time",
+          variant: "destructive",
+        });
+      } finally {
+        setIsAnalyzingWithLLM(false);
+      }
+    }
     
     if (currentAnalysisId) {
       try {
@@ -241,6 +288,17 @@ const Prediction = () => {
               onSave={handleSaveMedicalInfo}
               initialData={medicalInfo}
             />
+          )}
+          
+          {isAnalyzingWithLLM && (
+            <LLMAnalysisCard 
+              analysis={{ summary: '', recommendations: [], riskFactors: [], nextSteps: [] }} 
+              isLoading={true}
+            />
+          )}
+          
+          {llmAnalysis && !isAnalyzingWithLLM && (
+            <LLMAnalysisCard analysis={llmAnalysis} />
           )}
         </div>
       </div>

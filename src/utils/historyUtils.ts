@@ -26,6 +26,13 @@ export interface MedicalInfo {
   familyHistory?: string;
 }
 
+export interface LLMAnalysisResult {
+  summary: string;
+  recommendations: string[];
+  riskFactors: string[];
+  nextSteps: string[];
+}
+
 export interface AnalysisHistory {
   id: string;
   image: string;
@@ -36,6 +43,7 @@ export interface AnalysisHistory {
   time: string;
   userId?: string;
   medicalInfo?: MedicalInfo;
+  llmAnalysis?: LLMAnalysisResult;
 }
 
 // Helper function to compress base64 images to under 1MB
@@ -107,7 +115,8 @@ export const saveAnalysisToHistory = async (
   prediction: string,
   confidence: number,
   extractedText?: string,
-  medicalInfo?: MedicalInfo
+  medicalInfo?: MedicalInfo,
+  llmAnalysis?: LLMAnalysisResult
 ) => {
   const now = new Date();
   const currentUser = auth.currentUser;
@@ -154,7 +163,8 @@ export const saveAnalysisToHistory = async (
       time: now.toLocaleTimeString(),
       userId: currentUser.uid,
       createdAt: Timestamp.fromDate(now),
-      ...(medicalInfo && { medicalInfo }), // Only add if medicalInfo exists
+      ...(medicalInfo && { medicalInfo }),
+      ...(llmAnalysis && { llmAnalysis }),
     };
 
     console.log('💾 Saving analysis to Firestore...');
@@ -232,6 +242,7 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
             time: data.time,
             userId: data.userId,
             ...(data.medicalInfo && { medicalInfo: data.medicalInfo }),
+            ...(data.llmAnalysis && { llmAnalysis: data.llmAnalysis }),
           });
         });
 
@@ -269,6 +280,7 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
             time: data.time,
             userId: data.userId,
             ...(data.medicalInfo && { medicalInfo: data.medicalInfo }),
+            ...(data.llmAnalysis && { llmAnalysis: data.llmAnalysis }),
           });
         });
 
