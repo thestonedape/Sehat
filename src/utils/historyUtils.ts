@@ -25,6 +25,70 @@ export interface AnalysisHistory {
   userId?: string;
 }
 
+// Helper function to compress base64 images to under 1MB
+const compressImage = async (base64String: string, maxSizeKB: number = 800): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
+
+      // Calculate new dimensions to keep aspect ratio
+      let width = img.width;
+      let height = img.height;
+      const maxDimension = 1200; // Max width or height
+      
+      if (width > height) {
+        if (width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        }
+      } else {
+        if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Start with quality 0.8 and reduce if needed
+      let quality = 0.8;
+      let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+      
+      // Check size and reduce quality if needed
+      const sizeKB = (compressedDataUrl.length * 3) / 4 / 1024;
+      
+      if (sizeKB > maxSizeKB) {
+        quality = 0.6;
+        compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        
+        const newSizeKB = (compressedDataUrl.length * 3) / 4 / 1024;
+        if (newSizeKB > maxSizeKB) {
+          quality = 0.4;
+          compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+      }
+
+      console.log(`🖼️ Image compressed: ${Math.round(sizeKB)}KB → ${Math.round((compressedDataUrl.length * 3) / 4 / 1024)}KB`);
+      resolve(compressedDataUrl);
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image for compression'));
+    };
+
+    img.src = base64String;
+  });
+};
+
 export const saveAnalysisToHistory = async (
   imageUrl: string,
   prediction: string,
@@ -40,9 +104,26 @@ export const saveAnalysisToHistory = async (
   }
 
   try {
-    // For now, skip image upload - just save metadata with a placeholder
-    // TODO: Fix Firebase Storage CORS configuration
-    const storedImageUrl = 'placeholder'; // We'll store just metadata for now
+    let storedImageUrl = 'no-image'; // Default
+
+    // Try to compress and upload image to Firebase Storage
+    if (imageUrl.startsWith('data:')) {
+      try {
+        console.log('🔄 Compressing image...');
+        const compressedImage = await compressImage(imageUrl, 800);
+        
+        console.log('📤 Uploading compressed image to Firebase Storage...');
+        const imageRef = ref(storage, `analysis-images/${currentUser.uid}/${Date.now()}.jpg`);
+        
+        await uploadString(imageRef, compressedImage, 'data_url');
+        storedImageUrl = await getDownloadURL(imageRef);
+        console.log('✅ Image uploaded to Storage:', storedImageUrl);
+      } catch (uploadError: any) {
+        console.warn('⚠️ Storage upload failed (will save without image):', uploadError.message);
+        // Continue without image - don't fail the whole save
+        storedImageUrl = 'upload-failed';
+      }
+    }
 
     const analysis = {
       image: storedImageUrl,
@@ -55,7 +136,7 @@ export const saveAnalysisToHistory = async (
       createdAt: Timestamp.fromDate(now),
     };
 
-    console.log('💾 Saving analysis metadata to Firestore...');
+    console.log('💾 Saving analysis to Firestore...');
     const docRef = await addDoc(collection(db, 'analysisHistory'), analysis);
     console.log('✅ Analysis saved to Firestore:', docRef.id);
 
