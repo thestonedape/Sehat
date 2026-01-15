@@ -417,6 +417,3 @@ export const updateMedicalInfo = async (
     throw new Error(`Failed to update: ${error.message}`);
   }
 };
-  window.dispatchEvent(new CustomEvent('historyUpdated'));
-  console.log('Analysis history cleared');
-};
