@@ -115,7 +115,13 @@ export const saveAnalysisToHistory = async (
         console.log('📤 Uploading compressed image to Firebase Storage...');
         const imageRef = ref(storage, `analysis-images/${currentUser.uid}/${Date.now()}.jpg`);
         
-        await uploadString(imageRef, compressedImage, 'data_url');
+        // Add timeout to prevent infinite retries
+        const uploadPromise = uploadString(imageRef, compressedImage, 'data_url');
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Upload timeout')), 5000)
+        );
+        
+        await Promise.race([uploadPromise, timeoutPromise]);
         storedImageUrl = await getDownloadURL(imageRef);
         console.log('✅ Image uploaded to Storage:', storedImageUrl);
       } catch (uploadError: any) {
