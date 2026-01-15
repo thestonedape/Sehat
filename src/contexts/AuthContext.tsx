@@ -18,6 +18,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
+      
+      // Trigger history reload when auth state changes (login/logout)
+      if (user) {
+        console.log('🔐 User logged in, triggering history reload');
+        window.dispatchEvent(new CustomEvent('historyUpdated'));
+      }
     });
 
     return unsubscribe;
