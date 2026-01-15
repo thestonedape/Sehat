@@ -1,4 +1,5 @@
 import { MedicalInfo } from './historyUtils';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface LLMAnalysisResult {
   summary: string;
@@ -18,52 +19,26 @@ export const analyzeDiseaseWithLLM = async (
   }
 
   try {
-    const prompt = buildAnalysisPrompt(prediction, confidence, allPredictions, medicalInfo);
-    
-    // Using Google Gemini API
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
     if (!apiKey) {
       console.warn('⚠️ VITE_GEMINI_API_KEY not found in environment variables');
       return null;
     }
-    
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `You are a medical assistant helping to provide educational information about skin conditions. Always emphasize that this is for informational purposes only and users should consult healthcare professionals for proper diagnosis and treatment.\n\n${prompt}`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1000,
-          },
-        }),
-      }
-    );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Gemini API error:', response.status, errorData);
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
+    // Initialize the Google AI SDK
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-    const data = await response.json();
-    const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const prompt = buildAnalysisPrompt(prediction, confidence, allPredictions, medicalInfo);
     
+    // Generate content using the SDK
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const analysisText = response.text();
+
     if (!analysisText) {
-      console.error('No text in Gemini response:', data);
+      console.error('No text generated from Gemini');
       throw new Error('No text generated from Gemini');
     }
 
@@ -86,7 +61,8 @@ const buildAnalysisPrompt = (
     .map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`)
     .join(', ');
 
-  return `
+  return `You are a medical assistant helping to provide educational information about skin conditions. Always emphasize that this is for informational purposes only and users should consult healthcare professionals for proper diagnosis and treatment.
+
 I have an AI model prediction for a skin condition. Please provide a comprehensive analysis considering the patient's medical information.
 
 **AI Prediction:**
