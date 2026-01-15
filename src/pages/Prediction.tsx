@@ -256,6 +256,8 @@ const Prediction = () => {
   };
 
   if (showResults && result) {
+    console.log('🎯 Rendering results page. User:', currentUser ? 'logged in' : 'not logged in');
+    
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
