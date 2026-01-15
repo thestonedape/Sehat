@@ -4,13 +4,13 @@ import { getAuth, GoogleAuthProvider, RecaptchaVerifier } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAEP90TQEg7FZm_W0MDnQxbp3lR-SsEQKk",
-  authDomain: "givzo-7b792.firebaseapp.com",
-  projectId: "givzo-7b792",
-  storageBucket: "givzo-7b792.firebasestorage.app",
-  messagingSenderId: "864600122715",
-  appId: "1:864600122715:web:b2475ea5fce97366e7e67e",
-  measurementId: "G-LJLL7H7RLV"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
