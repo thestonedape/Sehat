@@ -34,60 +34,38 @@ export const saveAnalysisToHistory = async (
   const now = new Date();
   const currentUser = auth.currentUser;
 
+  if (!currentUser) {
+    console.log('⚠️ No user logged in, analysis will not be saved permanently');
+    throw new Error('Please login to save your analysis history');
+  }
+
   try {
-    let storedImageUrl = imageUrl;
+    // For now, skip image upload - just save metadata with a placeholder
+    // TODO: Fix Firebase Storage CORS configuration
+    const storedImageUrl = 'placeholder'; // We'll store just metadata for now
 
-    // Upload image to Firebase Storage if user is logged in
-    if (currentUser && imageUrl.startsWith('data:')) {
-      console.log('📤 Uploading image to Firebase Storage...');
-      const imageRef = ref(storage, `analysis-images/${currentUser.uid}/${Date.now()}.jpg`);
-      
-      try {
-        await uploadString(imageRef, imageUrl, 'data_url');
-        storedImageUrl = await getDownloadURL(imageRef);
-        console.log('✅ Image uploaded to Storage:', storedImageUrl);
-      } catch (uploadError) {
-        console.error('❌ Failed to upload image to Storage:', uploadError);
-        throw uploadError; // Don't save if upload fails
-      }
-    }
-
-    const analysis: Omit<AnalysisHistory, 'id'> = {
+    const analysis = {
       image: storedImageUrl,
       prediction,
       confidence,
       extractedText,
       date: now.toLocaleDateString(),
       time: now.toLocaleTimeString(),
-      userId: currentUser?.uid,
+      userId: currentUser.uid,
+      createdAt: Timestamp.fromDate(now),
     };
 
-    // Save to Firestore if user is logged in
-    if (currentUser) {
-      const docRef = await addDoc(collection(db, 'analysisHistory'), {
-        ...analysis,
-        createdAt: Timestamp.fromDate(now),
-      });
-      console.log('✅ Analysis saved to Firestore:', docRef.id);
-      console.log('User ID:', currentUser.uid);
+    console.log('💾 Saving analysis metadata to Firestore...');
+    const docRef = await addDoc(collection(db, 'analysisHistory'), analysis);
+    console.log('✅ Analysis saved to Firestore:', docRef.id);
 
-      // Don't save full base64 to localStorage - just save reference
-      const localAnalysis: AnalysisHistory = {
-        id: docRef.id,
-        ...analysis,
-      };
-      
-      return localAnalysis;
-    } else {
-      console.log('⚠️ No user logged in, analysis will not be saved permanently');
-      return {
-        id: `analysis_${Date.now()}`,
-        ...analysis,
-      };
-    }
-  } catch (error) {
+    return {
+      id: docRef.id,
+      ...analysis,
+    };
+  } catch (error: any) {
     console.error('❌ Error saving analysis:', error);
-    throw error; // Propagate error to show user
+    throw new Error(`Failed to save: ${error.message}`);
   }
 };
 
