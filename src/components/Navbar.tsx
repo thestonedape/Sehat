@@ -2,7 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { User, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContextType";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
