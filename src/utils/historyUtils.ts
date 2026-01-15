@@ -47,6 +47,9 @@ export const saveAnalysisToHistory = (
   // Save to localStorage
   localStorage.setItem('analysisHistory', JSON.stringify(history));
   
+  // Dispatch custom event to notify other components
+  window.dispatchEvent(new CustomEvent('historyUpdated'));
+  
   console.log('Analysis saved to history:', analysis);
   return analysis;
 };

@@ -1,21 +1,12 @@
 import { useState, useEffect } from "react";
 import { Calendar, Download, Eye, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { generateAnalysisPDF } from "../utils/pdfGenerator";
-
-interface AnalysisHistory {
-  id: string;
-  image: string;
-  prediction: string;
-  confidence: number;
-  extractedText?: string;
-  date: string;
-  time: string;
-}
+import { AnalysisHistory, getAnalysisHistory } from "../utils/historyUtils";
 
 const History = () => {
   const [history, setHistory] = useState<AnalysisHistory[]>([]);
@@ -23,21 +14,39 @@ const History = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const loadHistory = () => {
+    const loadedHistory = getAnalysisHistory();
+    setHistory(loadedHistory);
+    console.log('Loaded history:', loadedHistory);
+  };
 
   useEffect(() => {
-    // Load history from localStorage
-    const savedHistory = localStorage.getItem('analysisHistory');
-    if (savedHistory) {
-      try {
-        const parsedHistory = JSON.parse(savedHistory);
-        setHistory(parsedHistory);
-        console.log('Loaded history:', parsedHistory);
-      } catch (error) {
-        console.error('Error parsing history:', error);
-        setHistory([]);
+    // Load history when component mounts or when location changes
+    loadHistory();
+
+    // Listen for storage events (when localStorage changes in another tab/window)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'analysisHistory') {
+        loadHistory();
       }
-    }
-  }, []);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen for custom events (for same-tab updates)
+    const handleHistoryUpdate = () => {
+      loadHistory();
+    };
+
+    window.addEventListener('historyUpdated', handleHistoryUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('historyUpdated', handleHistoryUpdate);
+    };
+  }, [location]);
 
   const downloadPDF = (analysis: AnalysisHistory) => {
     try {

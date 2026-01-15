@@ -1,7 +1,8 @@
 
 import { useState, useRef } from "react";
-import { Upload, X, Loader2, Camera } from "lucide-react";
+import { Upload, X, Loader2, Camera, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { saveAnalysisToHistory } from "../utils/historyUtils";
 import PredictionCard from "../components/PredictionCard";
 
@@ -22,6 +23,7 @@ const Prediction = () => {
   const [showResults, setShowResults] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,16 +149,26 @@ const Prediction = () => {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
-          <div className="text-center">
+          <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-slate-900 mb-4">
               Analysis Results
             </h1>
-            <button
-              onClick={handleBackToUpload}
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              ← Back to Upload
-            </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleBackToUpload}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                ← Back to Upload
+              </button>
+              <span className="text-slate-300">|</span>
+              <button
+                onClick={() => navigate('/history')}
+                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2"
+              >
+                <History size={18} />
+                View All History
+              </button>
+            </div>
           </div>
           <PredictionCard result={result} />
         </div>
