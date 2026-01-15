@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle2, Lightbulb, TrendingUp } from "lucide-react";
+import { AlertCircle, Lightbulb, TrendingUp, FileSearch } from "lucide-react";
 import { LLMAnalysisResult } from "../utils/llmAnalysis";
 
 interface LLMAnalysisCardProps {
@@ -30,10 +30,10 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
     <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          🤖 Personalized AI Analysis
+          🤖 Diagnostic Analysis
         </CardTitle>
         <p className="text-sm text-slate-600 mt-1">
-          Based on your medical information and AI prediction
+          Understanding possible conditions based on AI predictions and your medical information
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -43,68 +43,71 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
             <div className="flex items-start gap-3">
               <Lightbulb className="text-purple-600 mt-1 flex-shrink-0" size={20} />
               <div>
-                <h4 className="font-semibold text-slate-900 mb-2">Summary</h4>
+                <h4 className="font-semibold text-slate-900 mb-2">Overview</h4>
                 <p className="text-sm text-slate-700 leading-relaxed">{analysis.summary}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Recommendations */}
-        {analysis.recommendations && analysis.recommendations.length > 0 && (
-          <div className="bg-white rounded-lg p-4 border border-green-100">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="text-green-600 mt-1 flex-shrink-0" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-slate-900 mb-3">Recommendations</h4>
-                <ul className="space-y-2">
-                  {analysis.recommendations.map((rec, idx) => (
-                    <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
-                      <span className="text-green-600 mt-0.5">✓</span>
-                      <span>{rec}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Risk Factors */}
-        {analysis.riskFactors && analysis.riskFactors.length > 0 && (
-          <div className="bg-white rounded-lg p-4 border border-orange-100">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="text-orange-600 mt-1 flex-shrink-0" size={20} />
-              <div className="flex-1">
-                <h4 className="font-semibold text-slate-900 mb-3">Risk Factors to Avoid</h4>
-                <ul className="space-y-2">
-                  {analysis.riskFactors.map((risk, idx) => (
-                    <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
-                      <span className="text-orange-600 mt-0.5">⚠</span>
-                      <span>{risk}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Next Steps */}
-        {analysis.nextSteps && analysis.nextSteps.length > 0 && (
+        {/* Primary Diagnosis Analysis */}
+        {analysis.primaryDiagnosisAnalysis && analysis.primaryDiagnosisAnalysis.length > 0 && (
           <div className="bg-white rounded-lg p-4 border border-blue-100">
             <div className="flex items-start gap-3">
               <TrendingUp className="text-blue-600 mt-1 flex-shrink-0" size={20} />
               <div className="flex-1">
-                <h4 className="font-semibold text-slate-900 mb-3">Next Steps</h4>
-                <ol className="space-y-2">
-                  {analysis.nextSteps.map((step, idx) => (
+                <h4 className="font-semibold text-slate-900 mb-3">Primary Prediction Analysis</h4>
+                <p className="text-xs text-slate-500 mb-2">Why this could be the correct diagnosis:</p>
+                <ul className="space-y-2">
+                  {analysis.primaryDiagnosisAnalysis.map((point, idx) => (
                     <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
-                      <span className="text-blue-600 font-semibold mt-0.5">{idx + 1}.</span>
-                      <span>{step}</span>
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      <span>{point}</span>
                     </li>
                   ))}
-                </ol>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Alternative Possibilities */}
+        {analysis.alternativePossibilities && analysis.alternativePossibilities.length > 0 && (
+          <div className="bg-white rounded-lg p-4 border border-indigo-100">
+            <div className="flex items-start gap-3">
+              <FileSearch className="text-indigo-600 mt-1 flex-shrink-0" size={20} />
+              <div className="flex-1">
+                <h4 className="font-semibold text-slate-900 mb-3">Alternative Possibilities</h4>
+                <p className="text-xs text-slate-500 mb-2">Other diagnoses to consider - the model's alternative predictions could be correct:</p>
+                <ul className="space-y-2">
+                  {analysis.alternativePossibilities.map((point, idx) => (
+                    <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">•</span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Clinical Considerations */}
+        {analysis.clinicalConsiderations && analysis.clinicalConsiderations.length > 0 && (
+          <div className="bg-white rounded-lg p-4 border border-orange-100">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="text-orange-600 mt-1 flex-shrink-0" size={20} />
+              <div className="flex-1">
+                <h4 className="font-semibold text-slate-900 mb-3">Clinical Considerations</h4>
+                <p className="text-xs text-slate-500 mb-2">Key factors for differential diagnosis:</p>
+                <ul className="space-y-2">
+                  {analysis.clinicalConsiderations.map((point, idx) => (
+                    <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
+                      <span className="text-orange-600 mt-0.5">•</span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
@@ -113,8 +116,8 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
         {/* Disclaimer */}
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-xs text-yellow-800">
-            <strong>⚕️ Medical Disclaimer:</strong> This AI analysis is for educational purposes only. 
-            Always consult with qualified healthcare professionals for proper medical diagnosis and treatment.
+            <strong>⚕️ Medical Disclaimer:</strong> This AI analysis discusses possible conditions for educational purposes only. 
+            A qualified healthcare professional must make the final diagnosis and prescribe appropriate treatment. Do not self-diagnose or self-treat.
           </p>
         </div>
       </CardContent>

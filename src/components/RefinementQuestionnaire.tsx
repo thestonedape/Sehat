@@ -56,7 +56,7 @@ const RefinementQuestionnaire = ({ onSave, initialData }: RefinementQuestionnair
               )}
             </CardTitle>
             <CardDescription>
-              Optional: Add medical details for more accurate recommendations
+              Optional: Add medical details for better diagnostic analysis
             </CardDescription>
           </div>
           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}

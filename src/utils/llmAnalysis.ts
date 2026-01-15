@@ -3,9 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface LLMAnalysisResult {
   summary: string;
-  recommendations: string[];
-  riskFactors: string[];
-  nextSteps: string[];
+  primaryDiagnosisAnalysis: string[];
+  alternativePossibilities: string[];
+  clinicalConsiderations: string[];
 }
 
 export const analyzeDiseaseWithLLM = async (
@@ -28,7 +28,7 @@ export const analyzeDiseaseWithLLM = async (
 
     // Initialize the Google AI SDK
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-preview' });
 
     const prompt = buildAnalysisPrompt(prediction, confidence, allPredictions, medicalInfo);
     
@@ -61,12 +61,12 @@ const buildAnalysisPrompt = (
     .map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`)
     .join(', ');
 
-  return `You are a medical assistant helping to provide educational information about skin conditions. Always emphasize that this is for informational purposes only and users should consult healthcare professionals for proper diagnosis and treatment.
+  return `You are a medical assistant analyzing possible skin conditions. Your role is to discuss what diseases these could be and why, NOT to provide treatment recommendations or solutions.
 
-I have an AI model prediction for a skin condition. Please provide a comprehensive analysis considering the patient's medical information.
+I have an AI model prediction for a skin condition. Please analyze ALL the possibilities - the primary prediction AND the alternative predictions - as any of them could be the correct diagnosis.
 
-**AI Prediction:**
-- Primary diagnosis: ${prediction} (${(confidence * 100).toFixed(1)}% confidence)
+**AI Predictions:**
+- Primary prediction: ${prediction} (${(confidence * 100).toFixed(1)}% confidence)
 - Alternative possibilities: ${topPredictions}
 
 **Patient Information:**
@@ -80,72 +80,75 @@ ${medicalInfo.medications ? `- Current Medications: ${medicalInfo.medications}` 
 ${medicalInfo.allergies ? `- Allergies: ${medicalInfo.allergies}` : ''}
 ${medicalInfo.familyHistory ? `- Family History: ${medicalInfo.familyHistory}` : ''}
 
-Please provide:
-1. **SUMMARY**: A brief analysis considering the AI prediction and patient context (2-3 sentences)
-2. **RECOMMENDATIONS**: 3-5 specific lifestyle or care recommendations
-3. **RISK_FACTORS**: 2-4 factors that may worsen or trigger this condition
-4. **NEXT_STEPS**: 3-4 actionable next steps for the patient
+Please provide a DIAGNOSTIC ANALYSIS (NOT treatment suggestions):
+1. **SUMMARY**: Overview of why these conditions are being considered based on the patient's profile (2-3 sentences)
+2. **PRIMARY_ANALYSIS**: 3-4 points explaining why the primary prediction (${prediction}) could be correct based on the patient's symptoms, history, and demographics
+3. **ALTERNATIVES**: 3-4 points explaining why the alternative predictions could also be correct - remember, the model's second or third prediction might be the actual diagnosis
+4. **CLINICAL_CONSIDERATIONS**: 2-3 important clinical factors or characteristics that would help differentiate between these conditions
+
+DO NOT include treatment recommendations, lifestyle advice, or solutions. Focus ONLY on diagnostic possibilities and clinical reasoning.
 
 Format your response EXACTLY like this:
 
 SUMMARY:
 [Your summary here]
 
-RECOMMENDATIONS:
-- [Recommendation 1]
-- [Recommendation 2]
-- [Recommendation 3]
+PRIMARY_ANALYSIS:
+- [Why primary prediction could be correct - point 1]
+- [Why primary prediction could be correct - point 2]
+- [Why primary prediction could be correct - point 3]
 
-RISK_FACTORS:
-- [Risk factor 1]
-- [Risk factor 2]
+ALTERNATIVES:
+- [Why alternative prediction could be correct - point 1]
+- [Why alternative prediction could be correct - point 2]
+- [Why alternative prediction could be correct - point 3]
 
-NEXT_STEPS:
-- [Next step 1]
-- [Next step 2]
-- [Next step 3]
+CLINICAL_CONSIDERATIONS:
+- [Differentiating factor 1]
+- [Differentiating factor 2]
+- [Differentiating factor 3]
 
-Remember: This is educational information only. Always emphasize consulting healthcare professionals.
+Remember: This is educational information only. Emphasize that a healthcare professional should make the final diagnosis.
 `.trim();
 };
 
 const parseAnalysisResponse = (text: string): LLMAnalysisResult => {
   const sections = {
     summary: '',
-    recommendations: [] as string[],
-    riskFactors: [] as string[],
-    nextSteps: [] as string[],
+    primaryDiagnosisAnalysis: [] as string[],
+    alternativePossibilities: [] as string[],
+    clinicalConsiderations: [] as string[],
   };
 
   try {
     // Extract summary
-    const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)(?=RECOMMENDATIONS:|$)/i);
+    const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)(?=PRIMARY_ANALYSIS:|$)/i);
     if (summaryMatch) {
       sections.summary = summaryMatch[1].trim();
     }
 
-    // Extract recommendations
-    const recsMatch = text.match(/RECOMMENDATIONS:\s*([\s\S]*?)(?=RISK_FACTORS:|$)/i);
-    if (recsMatch) {
-      sections.recommendations = recsMatch[1]
+    // Extract primary diagnosis analysis
+    const primaryMatch = text.match(/PRIMARY_ANALYSIS:\s*([\s\S]*?)(?=ALTERNATIVES:|$)/i);
+    if (primaryMatch) {
+      sections.primaryDiagnosisAnalysis = primaryMatch[1]
         .split('\n')
         .filter(line => line.trim().startsWith('-'))
         .map(line => line.replace(/^-\s*/, '').trim());
     }
 
-    // Extract risk factors
-    const riskMatch = text.match(/RISK_FACTORS:\s*([\s\S]*?)(?=NEXT_STEPS:|$)/i);
-    if (riskMatch) {
-      sections.riskFactors = riskMatch[1]
+    // Extract alternative possibilities
+    const altMatch = text.match(/ALTERNATIVES:\s*([\s\S]*?)(?=CLINICAL_CONSIDERATIONS:|$)/i);
+    if (altMatch) {
+      sections.alternativePossibilities = altMatch[1]
         .split('\n')
         .filter(line => line.trim().startsWith('-'))
         .map(line => line.replace(/^-\s*/, '').trim());
     }
 
-    // Extract next steps
-    const stepsMatch = text.match(/NEXT_STEPS:\s*([\s\S]*?)$/i);
-    if (stepsMatch) {
-      sections.nextSteps = stepsMatch[1]
+    // Extract clinical considerations
+    const clinicalMatch = text.match(/CLINICAL_CONSIDERATIONS:\s*([\s\S]*?)$/i);
+    if (clinicalMatch) {
+      sections.clinicalConsiderations = clinicalMatch[1]
         .split('\n')
         .filter(line => line.trim().startsWith('-'))
         .map(line => line.replace(/^-\s*/, '').trim());
