@@ -26,6 +26,27 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Wake up backend when component mounts
+  useEffect(() => {
+    const wakeUpBackend = async () => {
+      try {
+        console.log('🔌 Waking up backend server...');
+        // Fire-and-forget request to wake up the backend
+        fetch('https://sehatprobbackend.onrender.com/health', { 
+          method: 'GET',
+          mode: 'no-cors' // Bypass CORS for health check
+        }).catch(() => {
+          // Silently fail - this is just a wake-up call
+          console.log('⚡ Backend wake-up request sent');
+        });
+      } catch (error) {
+        // Ignore errors - this is just to wake up the server
+      }
+    };
+
+    wakeUpBackend();
+  }, []);
+
   const features = [
     {
       icon: Shield,
