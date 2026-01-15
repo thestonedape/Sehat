@@ -59,6 +59,7 @@ const History = () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('historyUpdated', handleHistoryUpdate);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const downloadPDF = (analysis: AnalysisHistory) => {

@@ -50,7 +50,8 @@ export const saveAnalysisToHistory = async (
         ...analysis,
         createdAt: Timestamp.fromDate(now),
       });
-      console.log('Analysis saved to Firestore:', docRef.id);
+      console.log('✅ Analysis saved to Firestore:', docRef.id);
+      console.log('User ID:', currentUser.uid);
 
       // Also save to localStorage as backup
       const localAnalysis: AnalysisHistory = {
@@ -61,6 +62,7 @@ export const saveAnalysisToHistory = async (
       
       return localAnalysis;
     } else {
+      console.log('⚠️ No user logged in, saving to localStorage only');
       // If not logged in, save only to localStorage
       const localAnalysis: AnalysisHistory = {
         id: `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -70,7 +72,7 @@ export const saveAnalysisToHistory = async (
       return localAnalysis;
     }
   } catch (error) {
-    console.error('Error saving analysis:', error);
+    console.error('❌ Error saving analysis to Firestore:', error);
     // Fallback to localStorage
     const localAnalysis: AnalysisHistory = {
       id: `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -116,6 +118,7 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
   try {
     // If user is logged in, fetch from Firestore
     if (currentUser) {
+      console.log('🔍 Fetching history from Firestore for user:', currentUser.uid);
       const q = query(
         collection(db, 'analysisHistory'),
         where('userId', '==', currentUser.uid),
@@ -139,6 +142,8 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
         });
       });
 
+      console.log(`✅ Loaded ${history.length} records from Firestore`);
+
       // Update localStorage cache
       if (history.length > 0) {
         localStorage.setItem('analysisHistory', JSON.stringify(history));
@@ -146,6 +151,7 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
 
       return history;
     } else {
+      console.log('⚠️ No user logged in, loading from localStorage');
       // If not logged in, fetch from localStorage
       const savedHistory = localStorage.getItem('analysisHistory');
       if (savedHistory) {
@@ -159,7 +165,7 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
       return [];
     }
   } catch (error) {
-    console.error('Error fetching history from Firestore:', error);
+    console.error('❌ Error fetching history from Firestore:', error);
     // Fallback to localStorage
     const savedHistory = localStorage.getItem('analysisHistory');
     if (savedHistory) {
