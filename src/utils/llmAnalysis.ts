@@ -20,37 +20,52 @@ export const analyzeDiseaseWithLLM = async (
   try {
     const prompt = buildAnalysisPrompt(prediction, confidence, allPredictions, medicalInfo);
     
-    // Call your LLM API endpoint
-    // You can use OpenAI, Anthropic Claude, Google Gemini, or your own endpoint
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`, // Add to .env
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', // or gpt-3.5-turbo for cheaper option
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a medical assistant helping to provide educational information about skin conditions. Always emphasize that this is for informational purposes only and users should consult healthcare professionals for proper diagnosis and treatment.'
+    // Using Google Gemini API
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('⚠️ VITE_GEMINI_API_KEY not found in environment variables');
+      return null;
+    }
+    
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are a medical assistant helping to provide educational information about skin conditions. Always emphasize that this is for informational purposes only and users should consult healthcare professionals for proper diagnosis and treatment.\n\n${prompt}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1000,
           },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`LLM API error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Gemini API error:', response.status, errorData);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const analysisText = data.choices[0].message.content;
+    const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!analysisText) {
+      console.error('No text in Gemini response:', data);
+      throw new Error('No text generated from Gemini');
+    }
 
     // Parse the structured response
     return parseAnalysisResponse(analysisText);
