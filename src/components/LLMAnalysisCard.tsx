@@ -33,7 +33,7 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
           🤖 Diagnostic Analysis
         </CardTitle>
         <p className="text-sm text-slate-600 mt-1">
-          Understanding possible conditions based on AI predictions and your medical information
+          Unbiased analysis of all possible conditions based on your clinical presentation
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -56,8 +56,8 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
             <div className="flex items-start gap-3">
               <TrendingUp className="text-blue-600 mt-1 flex-shrink-0" size={20} />
               <div className="flex-1">
-                <h4 className="font-semibold text-slate-900 mb-3">Primary Prediction Analysis</h4>
-                <p className="text-xs text-slate-500 mb-2">Why this could be the correct diagnosis:</p>
+                <h4 className="font-semibold text-slate-900 mb-3">Most Likely Diagnoses</h4>
+                <p className="text-xs text-slate-500 mb-2">Based on symptom match and clinical reasoning:</p>
                 <ul className="space-y-2">
                   {analysis.primaryDiagnosisAnalysis.map((point, idx) => (
                     <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">
@@ -77,8 +77,8 @@ const LLMAnalysisCard = ({ analysis, isLoading }: LLMAnalysisCardProps) => {
             <div className="flex items-start gap-3">
               <FileSearch className="text-indigo-600 mt-1 flex-shrink-0" size={20} />
               <div className="flex-1">
-                <h4 className="font-semibold text-slate-900 mb-3">Alternative Possibilities</h4>
-                <p className="text-xs text-slate-500 mb-2">Other diagnoses to consider - the model's alternative predictions could be correct:</p>
+                <h4 className="font-semibold text-slate-900 mb-3">Other Possibilities</h4>
+                <p className="text-xs text-slate-500 mb-2">Additional diagnoses that should not be ruled out:</p>
                 <ul className="space-y-2">
                   {analysis.alternativePossibilities.map((point, idx) => (
                     <li key={idx} className="text-sm text-slate-700 flex items-start gap-2">

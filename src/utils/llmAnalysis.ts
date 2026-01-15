@@ -56,18 +56,20 @@ const buildAnalysisPrompt = (
   allPredictions: Array<{ class_name: string; confidence: number }>,
   medicalInfo: MedicalInfo
 ): string => {
-  const topPredictions = allPredictions
-    .slice(0, 3)
-    .map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`)
-    .join(', ');
+  // Format all predictions equally without hierarchy
+  const allPredictionsFormatted = allPredictions
+    .slice(0, 5)
+    .map((p, idx) => `   ${idx + 1}. ${p.class_name}: ${(p.confidence * 100).toFixed(1)}% confidence`)
+    .join('\n');
 
   return `You are a medical assistant analyzing possible skin conditions. Your role is to discuss what diseases these could be and why, NOT to provide treatment recommendations or solutions.
 
-I have an AI model prediction for a skin condition. Please analyze ALL the possibilities - the primary prediction AND the alternative predictions - as any of them could be the correct diagnosis.
+CRITICAL INSTRUCTION: Do NOT assume the first prediction is more likely to be correct. The AI model has identified multiple possibilities with similar confidence levels. ANY of these predictions could be the actual diagnosis. Some may be prioritized for clinical urgency rather than likelihood.
 
-**AI Predictions:**
-- Primary prediction: ${prediction} (${(confidence * 100).toFixed(1)}% confidence)
-- Alternative possibilities: ${topPredictions}
+**AI Model Predictions (Listed by Clinical Priority, NOT Accuracy):**
+${allPredictionsFormatted}
+
+⚠️ IMPORTANT: The order above reflects clinical urgency or risk level, NOT diagnostic confidence. A prediction with lower confidence but higher risk may be listed first. Analyze ALL possibilities objectively based on the patient's clinical presentation.
 
 **Patient Information:**
 ${medicalInfo.age ? `- Age: ${medicalInfo.age}` : ''}
@@ -80,35 +82,51 @@ ${medicalInfo.medications ? `- Current Medications: ${medicalInfo.medications}` 
 ${medicalInfo.allergies ? `- Allergies: ${medicalInfo.allergies}` : ''}
 ${medicalInfo.familyHistory ? `- Family History: ${medicalInfo.familyHistory}` : ''}
 
-Please provide a DIAGNOSTIC ANALYSIS (NOT treatment suggestions):
-1. **SUMMARY**: Overview of why these conditions are being considered based on the patient's profile (2-3 sentences)
-2. **PRIMARY_ANALYSIS**: 3-4 points explaining why the primary prediction (${prediction}) could be correct based on the patient's symptoms, history, and demographics
-3. **ALTERNATIVES**: 3-4 points explaining why the alternative predictions could also be correct - remember, the model's second or third prediction might be the actual diagnosis
-4. **CLINICAL_CONSIDERATIONS**: 2-3 important clinical factors or characteristics that would help differentiate between these conditions
+Please provide an UNBIASED DIAGNOSTIC ANALYSIS:
 
-DO NOT include treatment recommendations, lifestyle advice, or solutions. Focus ONLY on diagnostic possibilities and clinical reasoning.
+1. **SUMMARY**: Neutral overview considering ALL predictions equally. Mention which symptoms support which diagnoses without favoring any particular prediction. (2-3 sentences)
+
+2. **PRIMARY_ANALYSIS**: Analyze the TOP 2-3 most likely diagnoses based SOLELY on:
+   - How well they match the patient's symptoms
+   - Clinical prevalence in the patient's demographics
+   - Confidence scores
+   Do NOT favor the first-listed prediction. Focus on clinical reasoning. (3-4 points total across all likely diagnoses)
+
+3. **ALTERNATIVES**: Discuss other plausible diagnoses from the list that shouldn't be ruled out. Explain what clinical features would support these diagnoses. (2-3 points)
+
+4. **CLINICAL_CONSIDERATIONS**: Key diagnostic features, tests, or examination findings that would help differentiate between ALL these conditions. Focus on discriminating factors. (2-3 points)
+
+DO NOT:
+- Assume the first prediction is correct
+- Provide treatment recommendations
+- Give lifestyle advice or solutions
+- Favor high-risk conditions just because they're urgent
+
+DO:
+- Analyze based on symptom match and clinical reasoning
+- Treat predictions with similar confidence as equally viable
+- Consider epidemiological factors (age, location, climate)
 
 Format your response EXACTLY like this:
 
 SUMMARY:
-[Your summary here]
+[Your unbiased summary considering all predictions]
 
 PRIMARY_ANALYSIS:
-- [Why primary prediction could be correct - point 1]
-- [Why primary prediction could be correct - point 2]
-- [Why primary prediction could be correct - point 3]
+- [Most likely diagnosis #1 based on symptoms/demographics: reasoning]
+- [Most likely diagnosis #2 based on symptoms/demographics: reasoning]
+- [Supporting evidence for top diagnoses]
 
 ALTERNATIVES:
-- [Why alternative prediction could be correct - point 1]
-- [Why alternative prediction could be correct - point 2]
-- [Why alternative prediction could be correct - point 3]
+- [Other diagnosis to consider and why]
+- [Another plausible diagnosis and supporting factors]
 
 CLINICAL_CONSIDERATIONS:
-- [Differentiating factor 1]
-- [Differentiating factor 2]
-- [Differentiating factor 3]
+- [Key differentiating factor #1]
+- [Key differentiating factor #2]
+- [Diagnostic approach or examination finding]
 
-Remember: This is educational information only. Emphasize that a healthcare professional should make the final diagnosis.
+Remember: This is educational information only. A healthcare professional must make the final diagnosis through proper clinical examination.
 `.trim();
 };
 
