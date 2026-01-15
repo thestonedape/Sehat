@@ -3,8 +3,9 @@ import { useState, useRef, useContext } from "react";
 import { Upload, X, Loader2, Camera, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { saveAnalysisToHistory } from "../utils/historyUtils";
+import { saveAnalysisToHistory, updateMedicalInfo, MedicalInfo } from "../utils/historyUtils";
 import PredictionCard from "../components/PredictionCard";
+import RefinementQuestionnaire from "../components/RefinementQuestionnaire";
 import { AuthContext } from "../contexts/AuthContextType";
 
 interface PredictionResult {
@@ -22,6 +23,8 @@ const Prediction = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
+  const [medicalInfo, setMedicalInfo] = useState<MedicalInfo | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -116,8 +119,10 @@ const Prediction = () => {
           previewUrl,
           data.predicted_class,
           data.confidence,
-          `Top predictions: ${data.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
+          `Top predictions: ${data.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`,
+          medicalInfo
         );
+        setCurrentAnalysisId(saved.id);
         console.log('✅ Analysis saved successfully:', saved);
       } catch (saveError: unknown) {
         console.error('❌ Failed to save to history:', saveError);
@@ -157,8 +162,10 @@ const Prediction = () => {
           previewUrl,
           mockResult.predicted_class,
           mockResult.confidence,
-          `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`
+          `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`,
+          medicalInfo
         );
+        setCurrentAnalysisId(saved.id);
         console.log('✅ Mock analysis saved successfully:', saved);
       } catch (saveError) {
         console.error('❌ Failed to save mock to history:', saveError);
@@ -177,6 +184,28 @@ const Prediction = () => {
   const handleBackToUpload = () => {
     setShowResults(false);
     setResult(null);
+    setCurrentAnalysisId(null);
+    setMedicalInfo(undefined);
+  };
+
+  const handleSaveMedicalInfo = async (info: MedicalInfo) => {
+    setMedicalInfo(info);
+    
+    if (currentAnalysisId) {
+      try {
+        await updateMedicalInfo(currentAnalysisId, info);
+        toast({
+          title: "Information Saved",
+          description: "Your medical information has been saved successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Save Failed",
+          description: "Failed to save medical information",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   if (showResults && result) {
@@ -204,7 +233,15 @@ const Prediction = () => {
               </button>
             </div>
           </div>
+          
           <PredictionCard result={result} />
+          
+          {currentUser && (
+            <RefinementQuestionnaire 
+              onSave={handleSaveMedicalInfo}
+              initialData={medicalInfo}
+            />
+          )}
         </div>
       </div>
     );

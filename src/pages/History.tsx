@@ -260,6 +260,68 @@ const History = () => {
                   </div>
                 )}
                 
+                {selectedAnalysis.medicalInfo && (
+                  <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                    <h4 className="font-medium text-slate-900 mb-3">📋 Medical Information</h4>
+                    <div className="grid md:grid-cols-2 gap-3 text-sm">
+                      {selectedAnalysis.medicalInfo.age && (
+                        <div>
+                          <span className="font-medium text-slate-700">Age:</span>{' '}
+                          <span className="text-slate-600">{selectedAnalysis.medicalInfo.age}</span>
+                        </div>
+                      )}
+                      {selectedAnalysis.medicalInfo.gender && (
+                        <div>
+                          <span className="font-medium text-slate-700">Gender:</span>{' '}
+                          <span className="text-slate-600 capitalize">{selectedAnalysis.medicalInfo.gender}</span>
+                        </div>
+                      )}
+                      {selectedAnalysis.medicalInfo.region && (
+                        <div>
+                          <span className="font-medium text-slate-700">Location:</span>{' '}
+                          <span className="text-slate-600">{selectedAnalysis.medicalInfo.region}</span>
+                        </div>
+                      )}
+                      {selectedAnalysis.medicalInfo.duration && (
+                        <div>
+                          <span className="font-medium text-slate-700">Duration:</span>{' '}
+                          <span className="text-slate-600">{selectedAnalysis.medicalInfo.duration}</span>
+                        </div>
+                      )}
+                    </div>
+                    {selectedAnalysis.medicalInfo.symptoms && (
+                      <div>
+                        <span className="font-medium text-slate-700">Symptoms:</span>{' '}
+                        <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.symptoms}</p>
+                      </div>
+                    )}
+                    {selectedAnalysis.medicalInfo.pastMedicalHistory && (
+                      <div>
+                        <span className="font-medium text-slate-700">Medical History:</span>{' '}
+                        <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.pastMedicalHistory}</p>
+                      </div>
+                    )}
+                    {selectedAnalysis.medicalInfo.medications && (
+                      <div>
+                        <span className="font-medium text-slate-700">Medications:</span>{' '}
+                        <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.medications}</p>
+                      </div>
+                    )}
+                    {selectedAnalysis.medicalInfo.allergies && (
+                      <div>
+                        <span className="font-medium text-slate-700">Allergies:</span>{' '}
+                        <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.allergies}</p>
+                      </div>
+                    )}
+                    {selectedAnalysis.medicalInfo.familyHistory && (
+                      <div>
+                        <span className="font-medium text-slate-700">Family History:</span>{' '}
+                        <p className="text-slate-600 mt-1">{selectedAnalysis.medicalInfo.familyHistory}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
                     <strong>Important:</strong> This analysis is for educational purposes only. 

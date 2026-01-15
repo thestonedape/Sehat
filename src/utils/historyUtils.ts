@@ -14,6 +14,18 @@ import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storag
 import { db, storage } from '../config/firebase';
 import { auth } from '../config/firebase';
 
+export interface MedicalInfo {
+  age?: string;
+  gender?: string;
+  region?: string;
+  duration?: string;
+  symptoms?: string;
+  pastMedicalHistory?: string;
+  medications?: string;
+  allergies?: string;
+  familyHistory?: string;
+}
+
 export interface AnalysisHistory {
   id: string;
   image: string;
@@ -23,6 +35,7 @@ export interface AnalysisHistory {
   date: string;
   time: string;
   userId?: string;
+  medicalInfo?: MedicalInfo;
 }
 
 // Helper function to compress base64 images to under 1MB
@@ -93,7 +106,8 @@ export const saveAnalysisToHistory = async (
   imageUrl: string,
   prediction: string,
   confidence: number,
-  extractedText?: string
+  extractedText?: string,
+  medicalInfo?: MedicalInfo
 ) => {
   const now = new Date();
   const currentUser = auth.currentUser;
@@ -140,6 +154,7 @@ export const saveAnalysisToHistory = async (
       time: now.toLocaleTimeString(),
       userId: currentUser.uid,
       createdAt: Timestamp.fromDate(now),
+      ...(medicalInfo && { medicalInfo }), // Only add if medicalInfo exists
     };
 
     console.log('💾 Saving analysis to Firestore...');
@@ -206,15 +221,17 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
         const history: AnalysisHistory[] = [];
         
         querySnapshot.forEach((doc) => {
+          const data = doc.data();
           history.push({
             id: doc.id,
-            image: doc.data().image,
-            prediction: doc.data().prediction,
-            confidence: doc.data().confidence,
-            extractedText: doc.data().extractedText,
-            date: doc.data().date,
-            time: doc.data().time,
-            userId: doc.data().userId,
+            image: data.image,
+            prediction: data.prediction,
+            confidence: data.confidence,
+            extractedText: data.extractedText,
+            date: data.date,
+            time: data.time,
+            userId: data.userId,
+            ...(data.medicalInfo && { medicalInfo: data.medicalInfo }),
           });
         });
 
@@ -241,15 +258,17 @@ export const getAnalysisHistory = async (): Promise<AnalysisHistory[]> => {
         const history: AnalysisHistory[] = [];
         
         querySnapshot.forEach((doc) => {
+          const data = doc.data();
           history.push({
             id: doc.id,
-            image: doc.data().image,
-            prediction: doc.data().prediction,
-            confidence: doc.data().confidence,
-            extractedText: doc.data().extractedText,
-            date: doc.data().date,
-            time: doc.data().time,
-            userId: doc.data().userId,
+            image: data.image,
+            prediction: data.prediction,
+            confidence: data.confidence,
+            extractedText: data.extractedText,
+            date: data.date,
+            time: data.time,
+            userId: data.userId,
+            ...(data.medicalInfo && { medicalInfo: data.medicalInfo }),
           });
         });
 
@@ -353,6 +372,39 @@ export const clearAnalysisHistory = async (): Promise<void> => {
 
   // Clear localStorage
   localStorage.removeItem('analysisHistory');
+  
+  // Dispatch event to notify components
+  window.dispatchEvent(new CustomEvent('historyUpdated'));
+};
+
+// Update medical info for an existing analysis
+export const updateMedicalInfo = async (
+  analysisId: string,
+  medicalInfo: MedicalInfo
+): Promise<void> => {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    throw new Error('Please login to update analysis information');
+  }
+
+  try {
+    const docRef = doc(db, 'analysisHistory', analysisId);
+    const { updateDoc } = await import('firebase/firestore');
+    
+    await updateDoc(docRef, {
+      medicalInfo
+    });
+
+    console.log('✅ Medical info updated for analysis:', analysisId);
+    
+    // Dispatch event to refresh history display
+    window.dispatchEvent(new CustomEvent('historyUpdated'));
+  } catch (error: any) {
+    console.error('❌ Error updating medical info:', error);
+    throw new Error(`Failed to update: ${error.message}`);
+  }
+};
   window.dispatchEvent(new CustomEvent('historyUpdated'));
   console.log('Analysis history cleared');
 };
