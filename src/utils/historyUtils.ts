@@ -28,9 +28,13 @@ export interface MedicalInfo {
 
 export interface LLMAnalysisResult {
   summary: string;
-  recommendations: string[];
-  riskFactors: string[];
-  nextSteps: string[];
+  primaryDiagnosisAnalysis?: string[];
+  alternativePossibilities?: string[];
+  clinicalConsiderations?: string[];
+  // Retain the earlier stored-history fields when reading existing documents.
+  recommendations?: string[];
+  riskFactors?: string[];
+  nextSteps?: string[];
 }
 
 export interface AnalysisHistory {

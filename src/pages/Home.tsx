@@ -4,6 +4,7 @@ import { ArrowRight, Shield, Zap, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from '../config/api';
 
 const Home = () => {
   const [displayText, setDisplayText] = useState("");
@@ -32,7 +33,7 @@ const Home = () => {
       try {
         console.log('🔌 Waking up backend server...');
         // Fire-and-forget request to wake up the backend
-        fetch('https://sehatprobbackend.onrender.com/health', { 
+        fetch(`${API_BASE_URL}/health`, { 
           method: 'GET',
           mode: 'no-cors' // Bypass CORS for health check
         }).catch(() => {

@@ -1,12 +1,6 @@
-import { MedicalInfo } from './historyUtils';
+import { MedicalInfo, LLMAnalysisResult } from './historyUtils';
+export type { LLMAnalysisResult } from './historyUtils';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
-export interface LLMAnalysisResult {
-  summary: string;
-  primaryDiagnosisAnalysis: string[];
-  alternativePossibilities: string[];
-  clinicalConsiderations: string[];
-}
 
 export const analyzeDiseaseWithLLM = async (
   prediction: string,

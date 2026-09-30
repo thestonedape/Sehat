@@ -9,6 +9,8 @@ import PredictionCard from "../components/PredictionCard";
 import RefinementQuestionnaire from "../components/RefinementQuestionnaire";
 import LLMAnalysisCard from "../components/LLMAnalysisCard";
 import { AuthContext } from "../contexts/AuthContextType";
+import { API_BASE_URL } from '../config/api';
+import { requestPrediction } from '../utils/predictionApi.mjs';
 
 interface PredictionResult {
   predicted_class: string;
@@ -39,10 +41,10 @@ const Prediction = () => {
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
       toast({
         title: "Invalid file type",
-        description: "Please select a valid image file (PNG, JPEG, etc.)",
+        description: "Please select a JPEG or PNG image",
         variant: "destructive",
       });
       return;
@@ -101,17 +103,7 @@ const Prediction = () => {
     formData.append('file', selectedFile);
 
     try {
-      const apiUrl = 'https://sehatprobbackend.onrender.com';
-      const response = await fetch(`${apiUrl}/predict`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await requestPrediction(API_BASE_URL, formData);
       console.log('✅ API response received:', data);
       setResult(data);
       setShowResults(true);
@@ -145,40 +137,13 @@ const Prediction = () => {
     } catch (error) {
       console.error('Error:', error);
       
-      // Mock response for demonstration when API is not available
-      const mockResult: PredictionResult = {
-        predicted_class: "Acne Vulgaris",
-        confidence: 0.85,
-        all_predictions: [
-          { class_name: "Acne Vulgaris", confidence: 0.85 },
-          { class_name: "Eczema", confidence: 0.10 },
-          { class_name: "Psoriasis", confidence: 0.05 }
-        ]
-      };
-      
-      setResult(mockResult);
-      setShowResults(true);
-      
-      // Save mock result to history with error handling
-      try {
-        console.log('💾 Saving mock analysis to history...');
-        const saved = await saveAnalysisToHistory(
-          previewUrl,
-          mockResult.predicted_class,
-          mockResult.confidence,
-          `Top predictions: ${mockResult.all_predictions.map(p => `${p.class_name} (${(p.confidence * 100).toFixed(1)}%)`).join(', ')}`,
-          medicalInfo
-        );
-        setCurrentAnalysisId(saved.id);
-        console.log('✅ Mock analysis saved successfully:', saved);
-      } catch (saveError) {
-        console.error('❌ Failed to save mock to history:', saveError);
-      }
-      
+      setResult(null);
+      setShowResults(false);
+      setCurrentAnalysisId(null);
       toast({
-        title: "Demo Mode",
-        description: "Showing sample results (API not connected)",
-        variant: "default",
+        title: "Analysis unavailable",
+        description: error instanceof Error ? error.message : "Please try again later.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -362,7 +327,7 @@ const Prediction = () => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png"
               onChange={handleFileSelect}
               className="hidden"
             />

@@ -2,6 +2,12 @@
 
 # Skin Disease Classification System
 
+## Serving reliability upgrade
+
+The existing frontend design is retained. Uploads accept JPEG/PNG up to 10 MB and use a bounded 120-second request timeout. API overload, invalid input, unavailable models and network failures display an error; they never generate or save a fabricated prediction. `VITE_API_BASE_URL` selects the backend, defaulting to the existing Render URL until a replacement is verified. Existing prediction fields and saved history remain compatible.
+
+Run `npm ci`, `npm test`, `npx tsc --noEmit -p tsconfig.app.json`, and `npm run build`. CI runs all these checks. Three API regression tests cover successful response compatibility, HTTP failures, network failures and malformed responses. Model-serving implementation and measured resource limits are documented in [SehatProbbackend](https://github.com/thestonedape/SehatProbbackend/tree/sde-upgrade).
+
 Hey, welcome to the **Sehat**! This is a slick AI-powered web app that takes a crack at identifying skin conditions from images using deep learning. We’re talking VGG16 here, fine-tuned to spot skin issues. It’s built to be helpful, but just a heads-up—it’s not your doctor!
 
 ---
